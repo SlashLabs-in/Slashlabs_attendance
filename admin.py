@@ -3,6 +3,7 @@ import datetime
 from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify
 from flask_login import login_required, current_user
 from werkzeug.utils import secure_filename
+from flask_wtf import FlaskForm
 import uuid
 import csv
 import io
@@ -109,6 +110,8 @@ def users():
     search = request.args.get('search', '')
     role = request.args.get('role', '')
     
+    form = FlaskForm()
+    
     query = User.query
     
     if search:
@@ -123,14 +126,17 @@ def users():
     
     users = query.order_by(User.created_at.desc()).all()
     
-    return render_template('admin/users.html', users=users)
+    return render_template('admin/users.html', users=users, form=form)
 
 
 @admin_bp.route('/users/add', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def add_user():
-    if request.method == 'POST':
+    # Create a form for CSRF protection
+    form = FlaskForm()
+    
+    if request.method == 'POST' and form.validate_on_submit():
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
@@ -165,7 +171,7 @@ def add_user():
         flash('User has been created successfully.', 'success')
         return redirect(url_for('admin.users'))
     
-    return render_template('admin/edit_user.html', user=None)
+    return render_template('admin/edit_user.html', user=None, form=form)
 
 
 @admin_bp.route('/users/edit/<int:user_id>', methods=['GET', 'POST'])
@@ -174,7 +180,10 @@ def add_user():
 def edit_user(user_id):
     user = User.query.get_or_404(user_id)
     
-    if request.method == 'POST':
+    # Create a form for CSRF protection
+    form = FlaskForm()
+    
+    if request.method == 'POST' and form.validate_on_submit():
         email = request.form.get('email')
         full_name = request.form.get('full_name')
         role = request.form.get('role')
@@ -202,13 +211,18 @@ def edit_user(user_id):
         flash('User has been updated successfully.', 'success')
         return redirect(url_for('admin.users'))
     
-    return render_template('admin/edit_user.html', user=user)
+    return render_template('admin/edit_user.html', user=user, form=form)
 
 
 @admin_bp.route('/users/delete/<int:user_id>', methods=['POST'])
 @login_required
 @admin_required
 def delete_user(user_id):
+    form = FlaskForm()
+    if not form.validate_on_submit():
+        flash('CSRF token validation failed.', 'danger')
+        return redirect(url_for('admin.users'))
+    
     user = User.query.get_or_404(user_id)
     
     if user.id == current_user.id:
@@ -271,6 +285,11 @@ def attendance():
 @login_required
 @admin_required
 def delete_attendance(attendance_id):
+    form = FlaskForm()
+    if not form.validate_on_submit():
+        flash('CSRF token validation failed.', 'danger')
+        return redirect(url_for('admin.attendance'))
+        
     attendance = Attendance.query.get_or_404(attendance_id)
     
     db.session.delete(attendance)
