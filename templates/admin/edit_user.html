@@ -1,8 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}
-    {% if user %}Edit User - {{ user.username }}{% else %}Add New User{% endif %} - Attendance System
-{% endblock %}
+{% block title %}{% if user %}Edit User{% else %}Add User{% endif %} - Admin{% endblock %}
 
 {% block content %}
 <div class="row">
@@ -14,83 +12,74 @@
                     {% if user %}Edit User: {{ user.username }}{% else %}Add New User{% endif %}
                 </h4>
             </div>
-        </div>
-    </div>
-</div>
-
-<div class="row mt-4">
-    <div class="col-md-8 mx-auto">
-        <div class="card">
             <div class="card-body">
-                <form method="POST" action="{% if user %}{{ url_for('admin.edit_user', user_id=user.id) }}{% else %}{{ url_for('admin.add_user') }}{% endif %}">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="username" class="form-label">Username</label>
-                                <input type="text" class="form-control" id="username" name="username" value="{{ user.username if user else '' }}" {% if user %}readonly{% else %}required{% endif %}>
-                                {% if user %}
-                                <small class="form-text text-muted">Username cannot be changed</small>
-                                {% endif %}
-                            </div>
+                <form method="POST" class="needs-validation" novalidate>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    
+                    {% if not user %}
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username*</label>
+                        <input type="text" class="form-control" id="username" name="username" required 
+                            {% if user %}value="{{ user.username }}" readonly{% endif %}>
+                        <div class="invalid-feedback">
+                            Please enter a username.
                         </div>
-                        
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" name="email" value="{{ user.email if user else '' }}" required>
-                            </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email*</label>
+                        <input type="email" class="form-control" id="email" name="email" required 
+                            {% if user %}value="{{ user.email }}"{% endif %}>
+                        <div class="invalid-feedback">
+                            Please enter a valid email address.
                         </div>
                     </div>
                     
                     <div class="mb-3">
-                        <label for="full_name" class="form-label">Full Name</label>
-                        <input type="text" class="form-control" id="full_name" name="full_name" value="{{ user.full_name if user else '' }}" required>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="role" class="form-label">Role</label>
-                                <select class="form-select" id="role" name="role" required>
-                                    <option value="employee" {% if user and user.role == 'employee' %}selected{% endif %}>Employee</option>
-                                    <option value="admin" {% if user and user.role == 'admin' %}selected{% endif %}>Admin</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="department" class="form-label">Department</label>
-                                <input type="text" class="form-control" id="department" name="department" value="{{ user.department if user else '' }}">
-                            </div>
+                        <label for="full_name" class="form-label">Full Name*</label>
+                        <input type="text" class="form-control" id="full_name" name="full_name" required 
+                            {% if user %}value="{{ user.full_name }}"{% endif %}>
+                        <div class="invalid-feedback">
+                            Please enter the full name.
                         </div>
                     </div>
                     
                     <div class="mb-3">
-                        <label for="position" class="form-label">Position/Title</label>
-                        <input type="text" class="form-control" id="position" name="position" value="{{ user.position if user else '' }}">
+                        <label for="role" class="form-label">Role*</label>
+                        <select class="form-select" id="role" name="role" required>
+                            <option value="employee" {% if user and user.role == 'employee' %}selected{% endif %}>Employee</option>
+                            <option value="admin" {% if user and user.role == 'admin' %}selected{% endif %}>Admin</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Please select a role.
+                        </div>
                     </div>
                     
                     <div class="mb-3">
-                        <label for="password" class="form-label">
-                            {% if user %}
-                                Password (leave blank to keep current)
-                            {% else %}
-                                Password
-                            {% endif %}
-                        </label>
-                        <input type="password" class="form-control" id="password" name="password" {% if not user %}required{% endif %}>
-                        {% if user %}
-                        <small class="form-text text-muted">Only fill this if you want to change the password</small>
-                        {% endif %}
+                        <label for="department" class="form-label">Department</label>
+                        <input type="text" class="form-control" id="department" name="department" 
+                            {% if user and user.department %}value="{{ user.department }}"{% endif %}>
                     </div>
                     
-                    <div class="d-flex justify-content-between">
-                        <a href="{{ url_for('admin.users') }}" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left me-2"></i>Back to Users
-                        </a>
+                    <div class="mb-3">
+                        <label for="position" class="form-label">Position</label>
+                        <input type="text" class="form-control" id="position" name="position" 
+                            {% if user and user.position %}value="{{ user.position }}"{% endif %}>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="password" class="form-label">{% if user %}New Password (leave blank to keep current){% else %}Password*{% endif %}</label>
+                        <input type="password" class="form-control" id="password" name="password" 
+                            {% if not user %}required{% endif %}>
+                        <div class="invalid-feedback">
+                            Please enter a password.
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('admin.users') }}" class="btn btn-secondary">Cancel</a>
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save me-2"></i>
                             {% if user %}Update User{% else %}Create User{% endif %}
                         </button>
                     </div>
@@ -99,4 +88,29 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Form validation script
+(function () {
+    'use strict'
+    
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    var forms = document.querySelectorAll('.needs-validation')
+    
+    // Loop over them and prevent submission
+    Array.prototype.slice.call(forms)
+        .forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                
+                form.classList.add('was-validated')
+            }, false)
+        })
+})()
+</script>
 {% endblock %}

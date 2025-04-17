@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+
+{% block title %}Reports - Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Attendance Reports</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <!-- Department Statistics -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0">Department Statistics</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="deptChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Status Statistics -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0">Attendance Status</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="statusChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Weekly Statistics -->
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Weekly Attendance</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                {% for stat in daily_stats %}
+                                <th class="text-center">{{ stat.day }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                {% for stat in daily_stats %}
+                                <td class="text-center">
+                                    <h5>{{ stat.count }}</h5>
+                                    <small class="text-muted">{{ stat.date }}</small>
+                                </td>
+                                {% endfor %}
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <canvas id="weeklyChart" height="300" class="mt-3"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Department Chart
+    const deptCtx = document.getElementById('deptChart').getContext('2d');
+    const deptData = {
+        labels: [
+            {% for dept in dept_stats %}
+                "{{ dept[0] or 'Not Assigned' }}",
+            {% endfor %}
+        ],
+        datasets: [{
+            data: [
+                {% for dept in dept_stats %}
+                    {{ dept[1] }},
+                {% endfor %}
+            ],
+            backgroundColor: [
+                'rgba(54, 162, 235, 0.7)',
+                'rgba(255, 99, 132, 0.7)',
+                'rgba(255, 205, 86, 0.7)',
+                'rgba(75, 192, 192, 0.7)',
+                'rgba(153, 102, 255, 0.7)',
+                'rgba(255, 159, 64, 0.7)'
+            ],
+            borderWidth: 1
+        }]
+    };
+    
+    new Chart(deptCtx, {
+        type: 'pie',
+        data: deptData,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'right',
+                },
+                title: {
+                    display: true,
+                    text: 'Employees by Department'
+                }
+            }
+        }
+    });
+    
+    // Status Chart
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    const statusData = {
+        labels: [
+            {% for status in status_stats %}
+                "{{ status[0] }}",
+            {% endfor %}
+        ],
+        datasets: [{
+            data: [
+                {% for status in status_stats %}
+                    {{ status[1] }},
+                {% endfor %}
+            ],
+            backgroundColor: [
+                'rgba(40, 167, 69, 0.7)',   // present - green
+                'rgba(255, 193, 7, 0.7)',   // late - yellow
+                'rgba(220, 53, 69, 0.7)',   // absent - red
+            ],
+            borderWidth: 1
+        }]
+    };
+    
+    new Chart(statusCtx, {
+        type: 'doughnut',
+        data: statusData,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'right',
+                },
+                title: {
+                    display: true,
+                    text: 'Attendance by Status'
+                }
+            }
+        }
+    });
+    
+    // Weekly Chart
+    const weeklyCtx = document.getElementById('weeklyChart').getContext('2d');
+    const weeklyData = {
+        labels: [
+            {% for stat in daily_stats %}
+                "{{ stat.day }}",
+            {% endfor %}
+        ],
+        datasets: [{
+            label: 'Daily Attendance',
+            data: [
+                {% for stat in daily_stats %}
+                    {{ stat.count }},
+                {% endfor %}
+            ],
+            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+        }]
+    };
+    
+    new Chart(weeklyCtx, {
+        type: 'bar',
+        data: weeklyData,
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
