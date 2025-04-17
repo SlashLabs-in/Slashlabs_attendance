@@ -1,0 +1,394 @@
+openapi: 3.0.0
+info:
+  title: Attendance Management System API
+  description: API for the Attendance Management System
+  version: 1.0.0
+  contact:
+    name: Support Team
+    email: support@attendance-system.com
+
+servers:
+  - url: https://your-domain.com/api
+    description: Production server
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier
+        username:
+          type: string
+          description: Unique username
+        email:
+          type: string
+          format: email
+          description: User's email address
+        full_name:
+          type: string
+          description: User's full name
+        role:
+          type: string
+          enum: [admin, employee]
+          description: User's role
+        department:
+          type: string
+          description: User's department
+        position:
+          type: string
+          description: User's job position
+      required:
+        - id
+        - username
+        - email
+        - full_name
+        - role
+    
+    Attendance:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier
+        user_id:
+          type: integer
+          description: ID of the user
+        check_in_time:
+          type: string
+          format: date-time
+          description: Time of check-in
+        check_out_time:
+          type: string
+          format: date-time
+          nullable: true
+          description: Time of check-out (can be null)
+        status:
+          type: string
+          enum: [present, late, absent]
+          description: Attendance status
+        image_path:
+          type: string
+          nullable: true
+          description: Path to the uploaded image
+        location:
+          type: string
+          nullable: true
+          description: Location information
+        notes:
+          type: string
+          nullable: true
+          description: Additional notes
+      required:
+        - id
+        - user_id
+        - check_in_time
+        - status
+    
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message
+
+paths:
+  /login:
+    post:
+      tags:
+        - Authentication
+      summary: Authenticate user
+      description: Authenticate a user and retrieve a JWT token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+              required:
+                - username
+                - password
+      responses:
+        '200':
+          description: Successful authentication
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: JWT token
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /attendance/check-in:
+    post:
+      tags:
+        - Attendance
+      summary: Check-in
+      description: Record a user's check-in to work
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: Image file to capture during check-in
+                location:
+                  type: string
+                  description: Location description or coordinates
+                status:
+                  type: string
+                  enum: [present, late, absent]
+                  default: present
+                  description: Attendance status
+                notes:
+                  type: string
+                  description: Additional notes about the check-in
+      responses:
+        '201':
+          description: Check-in successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  attendance:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      check_in_time:
+                        type: string
+                        format: date-time
+                      status:
+                        type: string
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /attendance/check-out:
+    post:
+      tags:
+        - Attendance
+      summary: Check-out
+      description: Record a user's check-out from work
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: Image file to capture during check-out
+                notes:
+                  type: string
+                  description: Additional notes about the check-out
+      responses:
+        '200':
+          description: Check-out successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  attendance:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      check_in_time:
+                        type: string
+                        format: date-time
+                      check_out_time:
+                        type: string
+                        format: date-time
+                      status:
+                        type: string
+        '404':
+          description: No active check-in found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /attendance/history:
+    get:
+      tags:
+        - Attendance
+      summary: Get attendance history
+      description: Retrieve a user's attendance history
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Page number for pagination
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          description: Records per page
+          schema:
+            type: integer
+            default: 10
+        - name: start_date
+          in: query
+          description: Filter records from this date (YYYY-MM-DD)
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          description: Filter records until this date (YYYY-MM-DD)
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  attendances:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Attendance'
+                  total:
+                    type: integer
+                  pages:
+                    type: integer
+                  current_page:
+                    type: integer
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/profile:
+    get:
+      tags:
+        - User Profile
+      summary: Get user profile
+      description: Retrieve the current user's profile information
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    put:
+      tags:
+        - User Profile
+      summary: Update user profile
+      description: Update the current user's profile information
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                full_name:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      username:
+                        type: string
+                      email:
+                        type: string
+                      full_name:
+                        type: string
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'

@@ -1,0 +1,229 @@
+{
+  "info": {
+    "name": "Attendance Management System API",
+    "description": "API collection for the Attendance Management System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"your_username\",\n  \"password\": \"your_password\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": ["{{base_url}}"],
+              "path": ["login"]
+            },
+            "description": "Authenticate a user and retrieve a JWT token."
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints for user authentication."
+    },
+    {
+      "name": "Attendance",
+      "item": [
+        {
+          "name": "Check-In",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "",
+                  "description": "Image file to capture during check-in."
+                },
+                {
+                  "key": "location",
+                  "value": "Office Building, Floor 3",
+                  "description": "Location description or coordinates."
+                },
+                {
+                  "key": "status",
+                  "value": "present",
+                  "description": "Attendance status (present, late, absent)."
+                },
+                {
+                  "key": "notes",
+                  "value": "Regular check-in.",
+                  "description": "Additional notes about the check-in."
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/attendance/check-in",
+              "host": ["{{base_url}}"],
+              "path": ["attendance", "check-in"]
+            },
+            "description": "Record a user's check-in to work."
+          },
+          "response": []
+        },
+        {
+          "name": "Check-Out",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "",
+                  "description": "Image file to capture during check-out."
+                },
+                {
+                  "key": "notes",
+                  "value": "Regular check-out.",
+                  "description": "Additional notes about the check-out."
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/attendance/check-out",
+              "host": ["{{base_url}}"],
+              "path": ["attendance", "check-out"]
+            },
+            "description": "Record a user's check-out from work."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Attendance History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/attendance/history?page=1&per_page=10&start_date=2025-01-01&end_date=2025-12-31",
+              "host": ["{{base_url}}"],
+              "path": ["attendance", "history"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number for pagination."
+                },
+                {
+                  "key": "per_page",
+                  "value": "10",
+                  "description": "Records per page."
+                },
+                {
+                  "key": "start_date",
+                  "value": "2025-01-01",
+                  "description": "Filter records from this date (YYYY-MM-DD)."
+                },
+                {
+                  "key": "end_date",
+                  "value": "2025-12-31",
+                  "description": "Filter records until this date (YYYY-MM-DD)."
+                }
+              ]
+            },
+            "description": "Retrieve a user's attendance history."
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints for managing attendance records."
+    },
+    {
+      "name": "User Profile",
+      "item": [
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/users/profile",
+              "host": ["{{base_url}}"],
+              "path": ["users", "profile"]
+            },
+            "description": "Retrieve the current user's profile information."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"new.email@example.com\",\n  \"full_name\": \"Updated Full Name\",\n  \"password\": \"new_password\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/users/profile",
+              "host": ["{{base_url}}"],
+              "path": ["users", "profile"]
+            },
+            "description": "Update the current user's profile information."
+          },
+          "response": []
+        }
+      ],
+      "description": "Endpoints for managing user profiles."
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://your-domain.com/api",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "your_jwt_token_here",
+      "type": "string"
+    }
+  ]
+}
