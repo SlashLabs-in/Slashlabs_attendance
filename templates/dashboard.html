@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Attendance System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-tachometer-alt me-2"></i>Employee Dashboard</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <i class="fas fa-user-circle fa-4x mb-3 text-primary"></i>
+                <h5 class="card-title">{{ current_user.full_name }}</h5>
+                <p class="card-text">{{ current_user.department or 'Department not set' }}</p>
+                <p class="card-text text-muted">{{ current_user.position or 'Position not set' }}</p>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('auth.reports') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-chart-line me-2"></i>View Reports
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Recent Attendance</h5>
+            </div>
+            <div class="card-body">
+                {% if attendances %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Check In</th>
+                                <th>Check Out</th>
+                                <th>Status</th>
+                                <th>Image</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for attendance in attendances %}
+                            <tr>
+                                <td>{{ attendance.check_in_time.strftime('%Y-%m-%d') }}</td>
+                                <td>{{ attendance.check_in_time.strftime('%H:%M:%S') }}</td>
+                                <td>
+                                    {% if attendance.check_out_time %}
+                                        {{ attendance.check_out_time.strftime('%H:%M:%S') }}
+                                    {% else %}
+                                        <span class="badge bg-warning">Not checked out</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if attendance.status == 'present' %}
+                                        <span class="badge bg-success">Present</span>
+                                    {% elif attendance.status == 'late' %}
+                                        <span class="badge bg-warning">Late</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Absent</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if attendance.image_path %}
+                                        <a href="{{ url_for('static', filename=attendance.image_path) }}" target="_blank">
+                                            <i class="fas fa-image text-info"></i>
+                                        </a>
+                                    {% else %}
+                                        <i class="fas fa-times-circle text-muted"></i>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>No attendance records found.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">API Information</h5>
+            </div>
+            <div class="card-body">
+                <p>Use our mobile app to check in/out remotely. The API endpoints are:</p>
+                <ul>
+                    <li><code>POST /api/attendance/check-in</code> - Check in with location and image</li>
+                    <li><code>POST /api/attendance/check-out</code> - Check out from your current session</li>
+                    <li><code>GET /api/attendance/history</code> - View your attendance history</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

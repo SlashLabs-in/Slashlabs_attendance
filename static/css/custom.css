@@ -1,0 +1,136 @@
+/* Custom CSS styles for the Attendance Management System */
+
+/* Use bootstrap variables for consistent colors */
+:root {
+    --primary-color: var(--bs-primary);
+    --secondary-color: var(--bs-secondary);
+    --success-color: var(--bs-success);
+    --info-color: var(--bs-info);
+    --warning-color: var(--bs-warning);
+    --danger-color: var(--bs-danger);
+}
+
+/* Card hover effect */
+.card.hover-effect {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card.hover-effect:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Custom card header for reports */
+.card-header-custom {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 15px;
+    border-radius: 5px 5px 0 0;
+}
+
+/* Image preview container */
+.image-preview-container {
+    width: 100%;
+    min-height: 150px;
+    border: 2px dashed var(--bs-border-color);
+    border-radius: 5px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-preview-container img {
+    max-width: 100%;
+    max-height: 200px;
+    display: none;
+}
+
+/* Status indicators */
+.status-indicator {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.status-present {
+    background-color: var(--success-color);
+}
+
+.status-late {
+    background-color: var(--warning-color);
+}
+
+.status-absent {
+    background-color: var(--danger-color);
+}
+
+/* Custom pagination */
+.custom-pagination .page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.custom-pagination .page-link {
+    color: var(--primary-color);
+}
+
+/* Dashboard stats */
+.stat-card {
+    text-align: center;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.stat-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.stat-label {
+    font-size: 1rem;
+    color: var(--bs-secondary);
+}
+
+/* Timeline for attendance history */
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 0;
+    height: 100%;
+    width: 2px;
+    background-color: var(--bs-border-color);
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -30px;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+}
+
+/* Custom Table Styles */
+.table-hover tbody tr:hover {
+    background-color: rgba(13, 110, 253, 0.1);
+}
