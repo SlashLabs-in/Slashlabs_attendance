@@ -3,6 +3,7 @@ import datetime
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_wtf import FlaskForm
 
 from app import db
 from models import User
@@ -24,7 +25,10 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for('auth.dashboard'))
     
-    if request.method == 'POST':
+    # Create a simple form for CSRF protection
+    form = FlaskForm()
+    
+    if request.method == 'POST' and form.validate_on_submit():
         username = request.form.get('username')
         password = request.form.get('password')
         remember = True if request.form.get('remember') else False
@@ -41,7 +45,7 @@ def login():
             return redirect(url_for('admin.dashboard'))
         return redirect(url_for('auth.dashboard'))
     
-    return render_template('login.html')
+    return render_template('login.html', form=form)
 
 
 @auth_bp.route('/logout')
@@ -56,7 +60,10 @@ def register():
     if current_user.is_authenticated:
         return redirect(url_for('auth.dashboard'))
     
-    if request.method == 'POST':
+    # Create a simple form for CSRF protection
+    form = FlaskForm()
+    
+    if request.method == 'POST' and form.validate_on_submit():
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
@@ -88,7 +95,7 @@ def register():
         flash('Registration successful! You can now login.', 'success')
         return redirect(url_for('auth.login'))
     
-    return render_template('register.html')
+    return render_template('register.html', form=form)
 
 
 @auth_bp.route('/dashboard')

@@ -23,8 +23,11 @@ def dashboard():
     
     # Today's statistics
     today = datetime.datetime.now().date()
+    today_start = datetime.datetime.combine(today, datetime.time.min)
+    today_end = datetime.datetime.combine(today, datetime.time.max)
     today_attendance = Attendance.query.filter(
-        db.func.date(Attendance.check_in_time) == today
+        Attendance.check_in_time >= today_start,
+        Attendance.check_in_time <= today_end
     ).count()
     
     # Get recent attendance records
@@ -41,7 +44,7 @@ def dashboard():
     current_year = datetime.datetime.now().year
     
     monthly_stats = db.session.query(
-        db.func.strftime('%d', Attendance.check_in_time).label('day'),
+        db.func.extract('day', Attendance.check_in_time).label('day'),
         db.func.count(Attendance.id).label('count')
     ).filter(
         db.extract('month', Attendance.check_in_time) == current_month,
@@ -263,7 +266,12 @@ def reports():
     daily_stats = []
     for i in range(7):
         day = start_of_week + datetime.timedelta(days=i)
-        count = Attendance.query.filter(db.func.date(Attendance.check_in_time) == day).count()
+        day_start = datetime.datetime.combine(day, datetime.time.min)
+        day_end = datetime.datetime.combine(day, datetime.time.max)
+        count = Attendance.query.filter(
+            Attendance.check_in_time >= day_start,
+            Attendance.check_in_time <= day_end
+        ).count()
         daily_stats.append({
             'day': day.strftime('%A'),
             'date': day.strftime('%Y-%m-%d'),
