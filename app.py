@@ -7,6 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
 from flask_login import LoginManager
 from werkzeug.middleware.proxy_fix import ProxyFix
+from flask_wtf.csrf import CSRFProtect
 
 
 # Set up logging
@@ -40,6 +41,10 @@ os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
 # Initialize the database
 db.init_app(app)
+
+# Initialize CSRF protection
+csrf = CSRFProtect()
+csrf.init_app(app)
 
 # Initialize LoginManager
 login_manager = LoginManager()

@@ -19,6 +19,9 @@ admin_bp = Blueprint('admin', __name__)
 @login_required
 @admin_required
 def dashboard():
+    # Create a form for CSRF protection
+    form = FlaskForm()
+    
     # Get attendance statistics
     total_users = User.query.count()
     
@@ -99,7 +102,8 @@ def dashboard():
         present_count=present_count,
         late_count=late_count,
         absent_count=absent_count,
-        dept_count=dept_count
+        dept_count=dept_count,
+        form=form
     )
 
 
@@ -245,6 +249,9 @@ def attendance():
     date_to = request.args.get('date_to', '')
     status = request.args.get('status', '')
     
+    # Create a form for CSRF protection
+    form = FlaskForm()
+    
     # Base query with join
     query = db.session.query(Attendance, User).join(User, Attendance.user_id == User.id)
     
@@ -277,7 +284,8 @@ def attendance():
         search=search,
         date_from=date_from,
         date_to=date_to,
-        status=status
+        status=status,
+        form=form
     )
 
 
@@ -303,6 +311,9 @@ def delete_attendance(attendance_id):
 @login_required
 @admin_required
 def reports():
+    # Create a form for CSRF protection
+    form = FlaskForm()
+    
     # Department statistics
     dept_stats = db.session.query(
         User.department,
@@ -338,7 +349,8 @@ def reports():
         'admin/reports.html',
         dept_stats=dept_stats,
         status_stats=status_stats,
-        daily_stats=daily_stats
+        daily_stats=daily_stats,
+        form=form
     )
 
 
