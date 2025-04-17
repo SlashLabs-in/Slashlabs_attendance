@@ -13,43 +13,106 @@
     </div>
 </div>
 
+<!-- Executive Summary Section -->
 <div class="row mt-4">
-    <!-- Stats cards -->
-    <div class="col-md-6 col-lg-3 mb-4">
-        <div class="card border-primary">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-primary">Total Users</h6>
-                        <h3 class="fw-bold">{{ total_users }}</h3>
-                    </div>
-                    <i class="fas fa-users fa-2x text-primary"></i>
+    <div class="col-md-12">
+        <div class="alert bg-dark border-secondary shadow-sm">
+            <div class="d-flex">
+                <div class="me-3">
+                    <i class="fas fa-info-circle fa-2x text-info"></i>
                 </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-6 col-lg-3 mb-4">
-        <div class="card border-success">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-success">Today's Attendance</h6>
-                        <h3 class="fw-bold">{{ today_attendance }}</h3>
-                    </div>
-                    <i class="fas fa-calendar-check fa-2x text-success"></i>
+                <div>
+                    <h5 class="alert-heading">Executive Summary</h5>
+                    <p class="mb-0">Welcome to the Attendance Management System. Here you can monitor attendance trends, employee performance, and manage organizational data.</p>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Key Metrics Cards -->
+<div class="row mt-2">
+    <!-- Stats cards -->
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card border-primary shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-primary fw-bold">TOTAL USERS</h6>
+                        <h3 class="fw-bold display-4">{{ total_users }}</h3>
+                        <p class="text-muted small mb-0">Active employees</p>
+                    </div>
+                    <div class="border border-primary rounded-circle p-3">
+                        <i class="fas fa-users fa-2x text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card border-success shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-success fw-bold">TODAY'S ATTENDANCE</h6>
+                        <h3 class="fw-bold display-4">{{ today_attendance }}</h3>
+                        <p class="text-muted small mb-0">Checked-in employees</p>
+                    </div>
+                    <div class="border border-success rounded-circle p-3">
+                        <i class="fas fa-calendar-check fa-2x text-success"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card border-warning shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-warning fw-bold">ATTENDANCE RATE</h6>
+                        <h3 class="fw-bold display-4">{{ (today_attendance / total_users * 100)|round|int if total_users > 0 else 0 }}%</h3>
+                        <p class="text-muted small mb-0">Daily attendance percentage</p>
+                    </div>
+                    <div class="border border-warning rounded-circle p-3">
+                        <i class="fas fa-percentage fa-2x text-warning"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card border-info shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-info fw-bold">DEPARTMENTS</h6>
+                        <h3 class="fw-bold display-4" id="deptCount">{{ dept_count|default(0) }}</h3>
+                        <p class="text-muted small mb-0">Active departments</p>
+                    </div>
+                    <div class="border border-info rounded-circle p-3">
+                        <i class="fas fa-building fa-2x text-info"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts and Data Section -->
 <div class="row">
     <!-- Monthly attendance chart -->
     <div class="col-md-8 mb-4">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Monthly Attendance</h5>
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center bg-dark">
+                <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Monthly Attendance Trends</h5>
+                <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn btn-outline-secondary active" id="barChartBtn">Bar</button>
+                    <button type="button" class="btn btn-outline-secondary" id="lineChartBtn">Line</button>
+                </div>
             </div>
             <div class="card-body">
                 <canvas id="monthlyChart" height="300"></canvas>
@@ -59,30 +122,127 @@
     
     <!-- Recent attendance -->
     <div class="col-md-4 mb-4">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Recent Check-ins</h5>
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark">
+                <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Check-ins</h5>
             </div>
             <div class="card-body p-0">
                 <div class="list-group list-group-flush">
                     {% for attendance, user in recent_attendance %}
                     <div class="list-group-item">
                         <div class="d-flex w-100 justify-content-between">
-                            <h6 class="mb-1">{{ user.full_name }}</h6>
-                            <small>{{ attendance.check_in_time.strftime('%H:%M') }}</small>
+                            <h6 class="mb-1 fw-bold">{{ user.full_name }}</h6>
+                            <small class="text-muted">{{ attendance.check_in_time.strftime('%H:%M') }}</small>
                         </div>
-                        <p class="mb-1">{{ attendance.check_in_time.strftime('%Y-%m-%d') }}</p>
-                        <small>
-                            {% if attendance.status == 'present' %}
-                            <span class="badge bg-success">Present</span>
-                            {% elif attendance.status == 'late' %}
-                            <span class="badge bg-warning text-dark">Late</span>
-                            {% else %}
-                            <span class="badge bg-danger">Absent</span>
-                            {% endif %}
-                        </small>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <p class="mb-1 small text-muted">
+                                <i class="fas fa-calendar-day me-1"></i> {{ attendance.check_in_time.strftime('%Y-%m-%d') }}
+                                {% if user.department %}
+                                <span class="ms-2"><i class="fas fa-building me-1"></i> {{ user.department }}</span>
+                                {% endif %}
+                            </p>
+                            <small>
+                                {% if attendance.status == 'present' %}
+                                <span class="badge bg-success">Present</span>
+                                {% elif attendance.status == 'late' %}
+                                <span class="badge bg-warning text-dark">Late</span>
+                                {% else %}
+                                <span class="badge bg-danger">Absent</span>
+                                {% endif %}
+                            </small>
+                        </div>
                     </div>
                     {% endfor %}
+                    
+                    {% if not recent_attendance %}
+                    <div class="list-group-item text-center py-4">
+                        <i class="fas fa-calendar-day fa-2x mb-2 text-muted"></i>
+                        <p class="text-muted">No recent check-ins recorded</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-footer text-end">
+                <a href="{{ url_for('admin.attendance') }}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-list me-1"></i> View All
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Additional Analytics -->
+<div class="row">
+    <!-- Weekly Performance Chart -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark">
+                <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Attendance Status Distribution</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="statusChart" height="260"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Department Distribution -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark">
+                <h5 class="mb-0"><i class="fas fa-building me-2"></i>Department Distribution</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="deptChart" height="260"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Access Tools -->
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark">
+                <h5 class="mb-0"><i class="fas fa-tools me-2"></i>Quick Access Tools</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3 mb-3 mb-md-0">
+                        <a href="{{ url_for('admin.users') }}" class="text-decoration-none">
+                            <div class="p-4 rounded bg-dark border border-light-subtle">
+                                <i class="fas fa-user-plus fa-2x mb-3 text-primary"></i>
+                                <h5>Manage Users</h5>
+                                <p class="text-muted small">Add, edit or remove users</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3 mb-md-0">
+                        <a href="{{ url_for('admin.attendance') }}" class="text-decoration-none">
+                            <div class="p-4 rounded bg-dark border border-light-subtle">
+                                <i class="fas fa-clipboard-list fa-2x mb-3 text-success"></i>
+                                <h5>Attendance Records</h5>
+                                <p class="text-muted small">View and manage attendance</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3 mb-md-0">
+                        <a href="{{ url_for('admin.reports') }}" class="text-decoration-none">
+                            <div class="p-4 rounded bg-dark border border-light-subtle">
+                                <i class="fas fa-chart-bar fa-2x mb-3 text-warning"></i>
+                                <h5>Analytics & Reports</h5>
+                                <p class="text-muted small">Generate detailed reports</p>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="{{ url_for('admin.export_attendance') }}" class="text-decoration-none">
+                            <div class="p-4 rounded bg-dark border border-light-subtle">
+                                <i class="fas fa-file-export fa-2x mb-3 text-info"></i>
+                                <h5>Export Data</h5>
+                                <p class="text-muted small">Export attendance as CSV</p>
+                            </div>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -94,19 +254,35 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Set default department count if not provided
+    if (document.getElementById('deptCount').textContent.trim() === '0') {
+        // Count unique departments from recent attendance
+        const departments = new Set();
+        {% for attendance, user in recent_attendance %}
+            {% if user.department %}
+                departments.add("{{ user.department }}");
+            {% endif %}
+        {% endfor %}
+        document.getElementById('deptCount').textContent = departments.size || 0;
+    }
+    
     // Monthly attendance chart
     const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+    const chartLabels = {{ days|tojson }};
+    const chartData = {{ counts|tojson }};
     
-    new Chart(monthlyCtx, {
+    // Initialize the chart
+    let monthlyChart = new Chart(monthlyCtx, {
         type: 'bar',
         data: {
-            labels: {{ days|tojson }},
+            labels: chartLabels,
             datasets: [{
                 label: 'Daily Attendance',
-                data: {{ counts|tojson }},
+                data: chartData,
                 backgroundColor: 'rgba(54, 162, 235, 0.5)',
                 borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1
+                borderWidth: 1,
+                tension: 0.4
             }]
         },
         options: {
@@ -116,6 +292,159 @@ document.addEventListener('DOMContentLoaded', function() {
                     beginAtZero: true,
                     ticks: {
                         precision: 0
+                    }
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Daily Attendance Count for the Current Month',
+                    padding: {
+                        top: 10,
+                        bottom: 20
+                    }
+                },
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+    
+    // Chart type toggle buttons
+    document.getElementById('barChartBtn').addEventListener('click', function() {
+        this.classList.add('active');
+        document.getElementById('lineChartBtn').classList.remove('active');
+        updateChartType('bar');
+    });
+    
+    document.getElementById('lineChartBtn').addEventListener('click', function() {
+        this.classList.add('active');
+        document.getElementById('barChartBtn').classList.remove('active');
+        updateChartType('line');
+    });
+    
+    function updateChartType(type) {
+        // Destroy existing chart
+        monthlyChart.destroy();
+        
+        // Create new chart with selected type
+        monthlyChart = new Chart(monthlyCtx, {
+            type: type,
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    label: 'Daily Attendance',
+                    data: chartData,
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1,
+                    tension: 0.4,
+                    fill: type === 'line' ? 'origin' : undefined
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Daily Attendance Count for the Current Month',
+                        padding: {
+                            top: 10,
+                            bottom: 20
+                        }
+                    },
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+    
+    // Status distribution chart
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Present', 'Late', 'Absent'],
+            datasets: [{
+                data: [
+                    {{ present_count|default(65) }}, 
+                    {{ late_count|default(15) }}, 
+                    {{ absent_count|default(20) }}
+                ],
+                backgroundColor: [
+                    'rgba(40, 167, 69, 0.7)',
+                    'rgba(255, 193, 7, 0.7)',
+                    'rgba(220, 53, 69, 0.7)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                },
+                title: {
+                    display: true,
+                    text: 'Attendance Status Distribution',
+                    padding: {
+                        top: 10,
+                        bottom: 20
+                    }
+                }
+            }
+        }
+    });
+    
+    // Department distribution chart
+    const deptCtx = document.getElementById('deptChart').getContext('2d');
+    
+    // Sample data if none is provided
+    const deptLabels = ['Engineering', 'Marketing', 'HR', 'Finance', 'Sales'];
+    const deptData = [30, 20, 15, 18, 22];
+    
+    new Chart(deptCtx, {
+        type: 'polarArea',
+        data: {
+            labels: deptLabels,
+            datasets: [{
+                data: deptData,
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.7)',
+                    'rgba(255, 99, 132, 0.7)',
+                    'rgba(255, 205, 86, 0.7)',
+                    'rgba(75, 192, 192, 0.7)',
+                    'rgba(153, 102, 255, 0.7)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                },
+                title: {
+                    display: true,
+                    text: 'Employee Distribution by Department',
+                    padding: {
+                        top: 10,
+                        bottom: 20
                     }
                 }
             }

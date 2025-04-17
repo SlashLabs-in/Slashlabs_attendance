@@ -52,8 +52,41 @@ def dashboard():
     ).group_by('day').all()
     
     # Format data for chart
-    days = [d[0] for d in monthly_stats]
+    days = [int(d[0]) for d in monthly_stats]
     counts = [d[1] for d in monthly_stats]
+    
+    # Get status distribution
+    current_month_start = datetime.datetime(current_year, current_month, 1)
+    next_month = current_month + 1 if current_month < 12 else 1
+    next_year = current_year if current_month < 12 else current_year + 1
+    current_month_end = datetime.datetime(next_year, next_month, 1) - datetime.timedelta(days=1)
+    current_month_end = datetime.datetime.combine(current_month_end, datetime.time.max)
+    
+    present_count = Attendance.query.filter(
+        Attendance.check_in_time >= current_month_start,
+        Attendance.check_in_time <= current_month_end,
+        Attendance.status == 'present'
+    ).count()
+    
+    late_count = Attendance.query.filter(
+        Attendance.check_in_time >= current_month_start,
+        Attendance.check_in_time <= current_month_end,
+        Attendance.status == 'late'
+    ).count()
+    
+    absent_count = Attendance.query.filter(
+        Attendance.check_in_time >= current_month_start,
+        Attendance.check_in_time <= current_month_end,
+        Attendance.status == 'absent'
+    ).count()
+    
+    # Department statistics
+    department_stats = db.session.query(
+        User.department,
+        db.func.count(User.id).label('count')
+    ).filter(User.department != None).group_by(User.department).all()
+    
+    dept_count = len(department_stats)
     
     return render_template(
         'admin/index.html',
@@ -61,7 +94,11 @@ def dashboard():
         today_attendance=today_attendance,
         recent_attendance=recent_attendance,
         days=days,
-        counts=counts
+        counts=counts,
+        present_count=present_count,
+        late_count=late_count,
+        absent_count=absent_count,
+        dept_count=dept_count
     )
 
 
