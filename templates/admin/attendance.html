@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% from 'components/lightbox.html' import image_lightbox %}
 
 {% block title %}Attendance Records - Admin{% endblock %}
 
@@ -118,7 +119,7 @@
                                 </td>
                                 <td>
                                     {% if attendance.image_path %}
-                                        <img width="30px" height="30px" src="{{ url_for('static', filename=attendance.image_path) }}" alt="Attendance Image" class="img-fluid" style="max-width: 100px;">
+                                        {{ image_lightbox(attendance.image_path) }}
                                     {% else %}
                                         <small class="text-muted">No image</small>
                                     {% endif %}
