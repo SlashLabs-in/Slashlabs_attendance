@@ -8,6 +8,7 @@ from sqlalchemy.orm import DeclarativeBase
 from flask_login import LoginManager
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_wtf.csrf import CSRFProtect
+from config import config
 
 
 # Set up logging
@@ -23,20 +24,17 @@ db = SQLAlchemy(model_class=Base)
 
 # Create Flask app
 app = Flask(__name__)
-app.secret_key = os.environ.get("SESSION_SECRET")
-app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)  # needed for url_for to generate with https
 
-# Configure database
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///attendance.db")
-app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-    "pool_recycle": 300,
-    "pool_pre_ping": True,
-}
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+# Load configuration based on environment
+env = os.environ.get('FLASK_ENV', 'development')
+app.config.from_object(config[env])
 
-# Configure file upload
-app.config["UPLOAD_FOLDER"] = os.path.join(app.root_path, "static/uploads")
-app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024  # 16MB max upload
+# Remove or comment out these lines since they're now in config.py
+# app.secret_key = os.environ.get("SESSION_SECRET")
+# app.config["UPLOAD_FOLDER"] = os.path.join(app.root_path, "static/uploads")
+# app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024  # 16MB max upload
+
+# Create upload folder
 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
 # Initialize the database

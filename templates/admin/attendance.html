@@ -79,6 +79,7 @@
                                 <th>Check-out</th>
                                 <th>Status</th>
                                 <th>Location</th>
+                                <th>Image</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -113,6 +114,13 @@
                                         <small>{{ attendance.location }}</small>
                                     {% else %}
                                         <small class="text-muted">Not recorded</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if attendance.image_path %}
+                                        <img width="30px" height="30px" src="{{ url_for('static', filename=attendance.image_path) }}" alt="Attendance Image" class="img-fluid" style="max-width: 100px;">
+                                    {% else %}
+                                        <small class="text-muted">No image</small>
                                     {% endif %}
                                 </td>
                                 <td>
