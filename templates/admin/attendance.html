@@ -111,12 +111,25 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    {% if attendance.location %}
-                                        <small>{{ attendance.location }}</small>
+                                    {% if attendance.location and 'Lat:' in attendance.location and 'Lng:' in attendance.location %}
+                                        {% set cleaned = attendance.location.replace('Lat:', '').replace('Lng:', '').strip() %}
+                                        {% set coords = cleaned.split(',') %}
+                                        {% if coords|length == 2 %}
+                                            {% set latitude = coords[0].strip() %}
+                                            {% set longitude = coords[1].strip() %}
+                                            <small>
+                                                <a href="https://www.google.com/maps/search/?api=1&query={{ latitude }},{{ longitude }}" target="_blank">
+                                                    {{ 'View Location' }}
+                                                </a>
+                                            </small>
+                                        {% else %}
+                                            <small class="text-muted">Invalid location format</small>
+                                        {% endif %}
                                     {% else %}
                                         <small class="text-muted">Not recorded</small>
                                     {% endif %}
                                 </td>
+                                
                                 <td>
                                     {% if attendance.image_path %}
                                         {{ image_lightbox(attendance.image_path) }}
@@ -127,7 +140,7 @@
                                 <td>
                                     <form method="POST" action="{{ url_for('admin.delete_attendance', attendance_id=attendance.id) }}" 
                                           onsubmit="return confirm('Are you sure you want to delete this attendance record?');">
-                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <!-- <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"> -->
                                         <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
                                             <i class="fas fa-trash"></i>
                                         </button>

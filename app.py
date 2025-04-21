@@ -44,6 +44,9 @@ db.init_app(app)
 # Initialize CSRF protection
 csrf = CSRFProtect()
 csrf.init_app(app)
+# Disable CSRF entirely (not recommended for production)
+app.config['WTF_CSRF_ENABLED'] = False
+
 
 # Initialize LoginManager
 login_manager = LoginManager()

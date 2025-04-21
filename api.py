@@ -50,8 +50,11 @@ def check_in(current_user):
         db.func.date(Attendance.check_in_time) == today
     ).first()
     
-    if existing_attendance and not existing_attendance.check_out_time:
-        return jsonify({'message': 'You are already checked in today.'}), 400
+    # if existing_attendance and not existing_attendance.check_out_time:
+    #     return jsonify({'message': 'You are already checked in today.'}), 400
+
+    if existing_attendance:
+     return jsonify({'message': 'You have already checked in today.'}), 400
     
     # Process image upload
     image_path = None
