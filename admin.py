@@ -90,6 +90,8 @@ def dashboard():
         db.func.count(User.id).label('count')
     ).filter(User.department != None).group_by(User.department).all()
     
+    dept_labels = [dept[0] for dept in department_stats]  # Department names
+    dept_counts = [dept[1] for dept in department_stats]  # User counts in each department
     dept_count = len(department_stats)
     
     return render_template(
@@ -103,6 +105,8 @@ def dashboard():
         late_count=late_count,
         absent_count=absent_count,
         dept_count=dept_count,
+        dept_labels=dept_labels,   # Pass department labels
+        dept_counts=dept_counts,   # Pass department counts
         form=form
     )
 

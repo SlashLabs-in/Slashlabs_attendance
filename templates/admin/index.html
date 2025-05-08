@@ -300,7 +300,7 @@ block content %}
     </div>
   </div>
 </div>
-{% endblock %} {% block scripts %}
+{% endblock %} {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
@@ -459,47 +459,58 @@ block content %}
           }
       });
 
-      // Department distribution chart
+      // Department distribution chart (Dynamic)
       const deptCtx = document.getElementById('deptChart').getContext('2d');
 
-      // Sample data if none is provided
-      const deptLabels = ['Engineering', 'Marketing', 'HR', 'Finance', 'Sales'];
-      const deptData = [30, 20, 15, 18, 22];
+      // Dynamically populate department data from the backend
+      const deptLabels = {{ dept_labels|tojson | safe }};  // Safe JSON rendering for department names
+      const deptData = {{ dept_counts|tojson | safe }};    // Safe JSON rendering for department user counts
 
-      new Chart(deptCtx, {
-          type: 'polarArea',
-          data: {
-              labels: deptLabels,
-              datasets: [{
-                  data: deptData,
-                  backgroundColor: [
-                      'rgba(54, 162, 235, 0.7)',
-                      'rgba(255, 99, 132, 0.7)',
-                      'rgba(255, 205, 86, 0.7)',
-                      'rgba(75, 192, 192, 0.7)',
-                      'rgba(153, 102, 255, 0.7)'
-                  ],
-                  borderWidth: 1
-              }]
-          },
-          options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                  legend: {
-                      position: 'right',
-                  },
-                  title: {
-                      display: true,
-                      text: 'Employee Distribution by Department',
-                      padding: {
-                          top: 10,
-                          bottom: 20
+      // Ensure deptLabels and deptData are not empty or undefined before creating the chart
+      if (deptLabels.length > 0 && deptData.length > 0) {
+          const departmentColors = [
+              'rgba(54, 162, 235, 0.7)',
+              'rgba(255, 99, 132, 0.7)',
+              'rgba(255, 205, 86, 0.7)',
+              'rgba(75, 192, 192, 0.7)',
+              'rgba(153, 102, 255, 0.7)',
+              // Add more colors if there are more departments
+          ];
+
+          const deptColors = deptLabels.map((label, index) => departmentColors[index % departmentColors.length]);
+
+          new Chart(deptCtx, {
+              type: 'polarArea',
+              data: {
+                  labels: deptLabels,
+                  datasets: [{
+                      data: deptData,
+                      backgroundColor: deptColors,
+                      borderWidth: 1
+                  }]
+              },
+              options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                      legend: {
+                          position: 'right',
+                      },
+                      title: {
+                          display: true,
+                          text: 'Employee Distribution by Department',
+                          padding: {
+                              top: 10,
+                              bottom: 20
+                          }
                       }
                   }
               }
-          }
-      });
+          });
+      } else {
+          console.error('Department data is empty or invalid.');
+      }
   });
 </script>
+
 {% endblock %}
