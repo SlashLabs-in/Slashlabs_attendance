@@ -22,73 +22,83 @@ def dashboard():
     # Create a form for CSRF protection
     form = FlaskForm()
     
-    # Get attendance statistics
-    total_users = User.query.count()
+    # Only count employees (exclude admins)
+    total_users = User.query.filter_by(role='employee').count()
     
-    # Today's statistics
+    # Today's statistics (only employees)
     today = datetime.datetime.now().date()
     today_start = datetime.datetime.combine(today, datetime.time.min)
     today_end = datetime.datetime.combine(today, datetime.time.max)
-    today_attendance = Attendance.query.filter(
+    today_attendance = db.session.query(Attendance).join(User).filter(
         Attendance.check_in_time >= today_start,
-        Attendance.check_in_time <= today_end
+        Attendance.check_in_time <= today_end,
+        User.role == 'employee'
     ).count()
     
-    # Get recent attendance records
+    # Get recent attendance records (only employees)
     recent_attendance = db.session.query(
         Attendance, User
     ).join(
         User, Attendance.user_id == User.id
+    ).filter(
+        User.role == 'employee'
     ).order_by(
         Attendance.check_in_time.desc()
     ).limit(10).all()
     
-    # Monthly statistics
+    # Monthly statistics (only employees)
     current_month = datetime.datetime.now().month
     current_year = datetime.datetime.now().year
     
     monthly_stats = db.session.query(
         db.func.extract('day', Attendance.check_in_time).label('day'),
         db.func.count(Attendance.id).label('count')
-    ).filter(
+    ).join(User).filter(
         db.extract('month', Attendance.check_in_time) == current_month,
-        db.extract('year', Attendance.check_in_time) == current_year
+        db.extract('year', Attendance.check_in_time) == current_year,
+        User.role == 'employee'
     ).group_by('day').all()
     
     # Format data for chart
     days = [int(d[0]) for d in monthly_stats]
     counts = [d[1] for d in monthly_stats]
     
-    # Get status distribution
+    # Get status distribution (only employees)
     current_month_start = datetime.datetime(current_year, current_month, 1)
     next_month = current_month + 1 if current_month < 12 else 1
     next_year = current_year if current_month < 12 else current_year + 1
     current_month_end = datetime.datetime(next_year, next_month, 1) - datetime.timedelta(days=1)
     current_month_end = datetime.datetime.combine(current_month_end, datetime.time.max)
     
-    present_count = Attendance.query.filter(
+    present_count = db.session.query(Attendance).join(User).filter(
         Attendance.check_in_time >= current_month_start,
         Attendance.check_in_time <= current_month_end,
-        Attendance.status == 'present'
+        Attendance.status == 'present',
+        User.role == 'employee'
     ).count()
     
-    late_count = Attendance.query.filter(
+    late_count = db.session.query(Attendance).join(User).filter(
         Attendance.check_in_time >= current_month_start,
         Attendance.check_in_time <= current_month_end,
-        Attendance.status == 'late'
+        Attendance.status == 'late',
+        User.role == 'employee'
     ).count()
     
-    absent_count = Attendance.query.filter(
+    absent_count = db.session.query(Attendance).join(User).filter(
         Attendance.check_in_time >= current_month_start,
         Attendance.check_in_time <= current_month_end,
-        Attendance.status == 'absent'
+        Attendance.status == 'absent',
+        User.role == 'employee'
     ).count()
     
-    # Department statistics
+    # Department statistics (only employees with department info)
     department_stats = db.session.query(
         User.department,
         db.func.count(User.id).label('count')
-    ).filter(User.department != None).group_by(User.department).all()
+    ).filter(
+        User.department != None,
+        User.role == 'employee'
+    ).group_by(User.department).all()
     
     dept_labels = [dept[0] for dept in department_stats]  # Department names
     dept_counts = [dept[1] for dept in department_stats]  # User counts in each department
@@ -105,8 +115,8 @@ def dashboard():
         late_count=late_count,
         absent_count=absent_count,
         dept_count=dept_count,
-        dept_labels=dept_labels,   # Pass department labels
-        dept_counts=dept_counts,   # Pass department counts
+        dept_labels=dept_labels,
+        dept_counts=dept_counts,
         form=form
     )
 
@@ -318,19 +328,24 @@ def reports():
     # Create a form for CSRF protection
     form = FlaskForm()
     
-    # Department statistics
+    # Department statistics (only employees)
     dept_stats = db.session.query(
         User.department,
         db.func.count(User.id).label('user_count')
+    ).filter(
+        User.department != None,
+        User.role == 'employee'
     ).group_by(User.department).all()
     
-    # Attendance statistics by status
+    # Attendance statistics by status (only employees)
     status_stats = db.session.query(
         Attendance.status,
         db.func.count(Attendance.id).label('count')
+    ).join(User).filter(
+        User.role == 'employee'
     ).group_by(Attendance.status).all()
     
-    # Weekly attendance
+    # Weekly attendance (only employees)
     today = datetime.datetime.now().date()
     start_of_week = today - datetime.timedelta(days=today.weekday())
     
@@ -339,10 +354,13 @@ def reports():
         day = start_of_week + datetime.timedelta(days=i)
         day_start = datetime.datetime.combine(day, datetime.time.min)
         day_end = datetime.datetime.combine(day, datetime.time.max)
-        count = Attendance.query.filter(
+        
+        count = db.session.query(Attendance).join(User).filter(
             Attendance.check_in_time >= day_start,
-            Attendance.check_in_time <= day_end
+            Attendance.check_in_time <= day_end,
+            User.role == 'employee'
         ).count()
+        
         daily_stats.append({
             'day': day.strftime('%A'),
             'date': day.strftime('%Y-%m-%d'),
@@ -356,7 +374,6 @@ def reports():
         daily_stats=daily_stats,
         form=form
     )
-
 
 @admin_bp.route('/export/attendance', methods=['GET'])
 @login_required
