@@ -1,150 +1,148 @@
-{% extends 'base.html' %}
-
-{% block title %}Reports - Attendance System{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% block title %}Reports - SlashLabs Attendance{%
+endblock %} {% block content %}
 <div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h4 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Attendance Reports</h4>
-            </div>
-        </div>
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">
+          <i class="fas fa-chart-bar me-2"></i>Attendance Reports
+        </h4>
+      </div>
     </div>
+  </div>
 </div>
 
 <div class="row mt-4">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Monthly Statistics</h5>
-            </div>
-            <div class="card-body">
-                <canvas id="monthlyChart" height="250"></canvas>
-            </div>
-        </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Monthly Statistics</h5>
+      </div>
+      <div class="card-body">
+        <canvas id="monthlyChart" height="250"></canvas>
+      </div>
     </div>
-    
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Weekly Attendance</h5>
-            </div>
-            <div class="card-body">
-                <canvas id="weeklyChart" height="250"></canvas>
-            </div>
-        </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Weekly Attendance</h5>
+      </div>
+      <div class="card-body">
+        <canvas id="weeklyChart" height="250"></canvas>
+      </div>
     </div>
+  </div>
 </div>
 
 <div class="row mt-4">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Attendance Summary</h5>
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Attendance Summary</h5>
+      </div>
+      <div class="card-body">
+        <div class="row text-center">
+          <div class="col-md-3">
+            <div class="border rounded p-3 mb-3">
+              <h2 class="text-primary">{{ attendance_data.total }}</h2>
+              <p class="mb-0">Total Days</p>
             </div>
-            <div class="card-body">
-                <div class="row text-center">
-                    <div class="col-md-3">
-                        <div class="border rounded p-3 mb-3">
-                            <h2 class="text-primary">{{ attendance_data.total }}</h2>
-                            <p class="mb-0">Total Days</p>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="border rounded p-3 mb-3">
-                            <h2 class="text-success">{{ attendance_data.present }}</h2>
-                            <p class="mb-0">Present</p>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="border rounded p-3 mb-3">
-                            <h2 class="text-warning">{{ attendance_data.late }}</h2>
-                            <p class="mb-0">Late</p>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="border rounded p-3 mb-3">
-                            <h2 class="text-danger">{{ attendance_data.absent }}</h2>
-                            <p class="mb-0">Absent</p>
-                        </div>
-                    </div>
-                </div>
+          </div>
+          <div class="col-md-3">
+            <div class="border rounded p-3 mb-3">
+              <h2 class="text-success">{{ attendance_data.present }}</h2>
+              <p class="mb-0">Present</p>
             </div>
+          </div>
+          <div class="col-md-3">
+            <div class="border rounded p-3 mb-3">
+              <h2 class="text-warning">{{ attendance_data.late }}</h2>
+              <p class="mb-0">Late</p>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="border rounded p-3 mb-3">
+              <h2 class="text-danger">{{ attendance_data.absent }}</h2>
+              <p class="mb-0">Absent</p>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </div>
 
 {% block extra_js %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Monthly attendance chart
-    const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
-    new Chart(monthlyCtx, {
-        type: 'pie',
-        data: {
-            labels: ['Present', 'Late', 'Absent'],
-            datasets: [{
-                data: [
-                    {{ attendance_data.present }},
-                    {{ attendance_data.late }},
-                    {{ attendance_data.absent }}
-                ],
-                backgroundColor: [
-                    'rgba(40, 167, 69, 0.7)',  // green
-                    'rgba(255, 193, 7, 0.7)',  // yellow
-                    'rgba(220, 53, 69, 0.7)'   // red
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                },
-                title: {
-                    display: true,
-                    text: 'Monthly Attendance Distribution'
-                }
-            }
-        }
-    });
-    
-    // Weekly attendance chart
-    const weeklyCtx = document.getElementById('weeklyChart').getContext('2d');
-    new Chart(weeklyCtx, {
-        type: 'bar',
-        data: {
-            labels: {{ day_labels|tojson }},
-            datasets: [{
-                label: 'Attendance Count',
-                data: {{ day_counts|tojson }},
-                backgroundColor: 'rgba(13, 110, 253, 0.7)',
-                borderColor: 'rgba(13, 110, 253, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1
-                    }
-                }
-            },
-            plugins: {
-                title: {
-                    display: true,
-                    text: 'Weekly Attendance Pattern'
-                }
-            }
-        }
-    });
-});
+  document.addEventListener('DOMContentLoaded', function() {
+      // Monthly attendance chart
+      const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+      new Chart(monthlyCtx, {
+          type: 'pie',
+          data: {
+              labels: ['Present', 'Late', 'Absent'],
+              datasets: [{
+                  data: [
+                      {{ attendance_data.present }},
+                      {{ attendance_data.late }},
+                      {{ attendance_data.absent }}
+                  ],
+                  backgroundColor: [
+                      'rgba(40, 167, 69, 0.7)',  // green
+                      'rgba(255, 193, 7, 0.7)',  // yellow
+                      'rgba(220, 53, 69, 0.7)'   // red
+                  ],
+                  borderWidth: 1
+              }]
+          },
+          options: {
+              responsive: true,
+              plugins: {
+                  legend: {
+                      position: 'bottom',
+                  },
+                  title: {
+                      display: true,
+                      text: 'Monthly Attendance Distribution'
+                  }
+              }
+          }
+      });
+
+      // Weekly attendance chart
+      const weeklyCtx = document.getElementById('weeklyChart').getContext('2d');
+      new Chart(weeklyCtx, {
+          type: 'bar',
+          data: {
+              labels: {{ day_labels|tojson }},
+              datasets: [{
+                  label: 'Attendance Count',
+                  data: {{ day_counts|tojson }},
+                  backgroundColor: 'rgba(13, 110, 253, 0.7)',
+                  borderColor: 'rgba(13, 110, 253, 1)',
+                  borderWidth: 1
+              }]
+          },
+          options: {
+              responsive: true,
+              scales: {
+                  y: {
+                      beginAtZero: true,
+                      ticks: {
+                          stepSize: 1
+                      }
+                  }
+              },
+              plugins: {
+                  title: {
+                      display: true,
+                      text: 'Weekly Attendance Pattern'
+                  }
+              }
+          }
+      });
+  });
 </script>
-{% endblock %}
-{% endblock %}
+{% endblock %} {% endblock %}

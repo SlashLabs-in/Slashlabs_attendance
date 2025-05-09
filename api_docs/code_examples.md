@@ -1,6 +1,6 @@
 # API Code Examples
 
-This document provides code examples for interacting with the Attendance Management System API in different programming languages.
+This document provides code examples for interacting with the SlashLabs Attendance System API in different programming languages.
 
 ## Authentication
 
@@ -22,26 +22,26 @@ curl -X POST 'https://your-domain.com/api/login' \
 ```javascript
 const loginUser = async (username, password) => {
   try {
-    const response = await fetch('https://your-domain.com/api/login', {
-      method: 'POST',
+    const response = await fetch("https://your-domain.com/api/login", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         username,
-        password
-      })
+        password,
+      }),
     });
-    
+
     if (!response.ok) {
-      throw new Error('Login failed');
+      throw new Error("Login failed");
     }
-    
+
     const data = await response.json();
-    localStorage.setItem('token', data.token);
+    localStorage.setItem("token", data.token);
     return data;
   } catch (error) {
-    console.error('Error:', error);
+    console.error("Error:", error);
   }
 };
 ```
@@ -57,9 +57,9 @@ def login_user(username, password):
         'username': username,
         'password': password
     }
-    
+
     response = requests.post(url, json=payload)
-    
+
     if response.status_code == 200:
         data = response.json()
         token = data['token']
@@ -77,25 +77,25 @@ func login(username: String, password: String, completion: @escaping (Result<Str
     var request = URLRequest(url: url)
     request.httpMethod = "POST"
     request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-    
+
     let body: [String: Any] = [
         "username": username,
         "password": password
     ]
-    
+
     request.httpBody = try? JSONSerialization.data(withJSONObject: body)
-    
+
     URLSession.shared.dataTask(with: request) { data, response, error in
         if let error = error {
             completion(.failure(error))
             return
         }
-        
+
         guard let data = data else {
             completion(.failure(NSError(domain: "No data", code: 0)))
             return
         }
-        
+
         do {
             if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
                let token = json["token"] as? String {
@@ -130,44 +130,47 @@ curl -X POST 'https://your-domain.com/api/attendance/check-in' \
 ```javascript
 const checkIn = async (location, status, notes, imageFile) => {
   try {
-    const token = localStorage.getItem('token');
-    
+    const token = localStorage.getItem("token");
+
     if (!token) {
-      throw new Error('Not authenticated');
+      throw new Error("Not authenticated");
     }
-    
+
     const formData = new FormData();
     if (imageFile) {
-      formData.append('image', imageFile);
+      formData.append("image", imageFile);
     }
-    
+
     if (location) {
-      formData.append('location', location);
+      formData.append("location", location);
     }
-    
+
     if (status) {
-      formData.append('status', status);
+      formData.append("status", status);
     }
-    
+
     if (notes) {
-      formData.append('notes', notes);
+      formData.append("notes", notes);
     }
-    
-    const response = await fetch('https://your-domain.com/api/attendance/check-in', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      },
-      body: formData
-    });
-    
+
+    const response = await fetch(
+      "https://your-domain.com/api/attendance/check-in",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      }
+    );
+
     if (!response.ok) {
-      throw new Error('Check-in failed');
+      throw new Error("Check-in failed");
     }
-    
+
     return await response.json();
   } catch (error) {
-    console.error('Error:', error);
+    console.error("Error:", error);
   }
 };
 ```
@@ -182,26 +185,26 @@ def check_in(token, location=None, status='present', notes=None, image_path=None
     headers = {
         'Authorization': f'Bearer {token}'
     }
-    
+
     data = {}
     if location:
         data['location'] = location
-    
+
     if status:
         data['status'] = status
-    
+
     if notes:
         data['notes'] = notes
-    
+
     files = {}
     if image_path:
         files['image'] = open(image_path, 'rb')
-    
+
     response = requests.post(url, headers=headers, data=data, files=files)
-    
+
     if files and 'image' in files:
         files['image'].close()
-    
+
     if response.status_code == 201:
         return response.json()
     else:
@@ -221,38 +224,43 @@ curl -X GET 'https://your-domain.com/api/attendance/history?page=1&per_page=10&s
 #### JavaScript (Fetch)
 
 ```javascript
-const getAttendanceHistory = async (page = 1, perPage = 10, startDate = null, endDate = null) => {
+const getAttendanceHistory = async (
+  page = 1,
+  perPage = 10,
+  startDate = null,
+  endDate = null
+) => {
   try {
-    const token = localStorage.getItem('token');
-    
+    const token = localStorage.getItem("token");
+
     if (!token) {
-      throw new Error('Not authenticated');
+      throw new Error("Not authenticated");
     }
-    
+
     let url = `https://your-domain.com/api/attendance/history?page=${page}&per_page=${perPage}`;
-    
+
     if (startDate) {
       url += `&start_date=${startDate}`;
     }
-    
+
     if (endDate) {
       url += `&end_date=${endDate}`;
     }
-    
+
     const response = await fetch(url, {
-      method: 'GET',
+      method: "GET",
       headers: {
-        'Authorization': `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
-    
+
     if (!response.ok) {
-      throw new Error('Failed to get attendance history');
+      throw new Error("Failed to get attendance history");
     }
-    
+
     return await response.json();
   } catch (error) {
-    console.error('Error:', error);
+    console.error("Error:", error);
   }
 };
 ```
@@ -264,19 +272,19 @@ import requests
 
 def get_attendance_history(token, page=1, per_page=10, start_date=None, end_date=None):
     url = f'https://your-domain.com/api/attendance/history?page={page}&per_page={per_page}'
-    
+
     if start_date:
         url += f'&start_date={start_date}'
-    
+
     if end_date:
         url += f'&end_date={end_date}'
-    
+
     headers = {
         'Authorization': f'Bearer {token}'
     }
-    
+
     response = requests.get(url, headers=headers)
-    
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -300,26 +308,26 @@ curl -X GET 'https://your-domain.com/api/users/profile' \
 ```javascript
 const getUserProfile = async () => {
   try {
-    const token = localStorage.getItem('token');
-    
+    const token = localStorage.getItem("token");
+
     if (!token) {
-      throw new Error('Not authenticated');
+      throw new Error("Not authenticated");
     }
-    
-    const response = await fetch('https://your-domain.com/api/users/profile', {
-      method: 'GET',
+
+    const response = await fetch("https://your-domain.com/api/users/profile", {
+      method: "GET",
       headers: {
-        'Authorization': `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
-    
+
     if (!response.ok) {
-      throw new Error('Failed to get user profile');
+      throw new Error("Failed to get user profile");
     }
-    
+
     return await response.json();
   } catch (error) {
-    console.error('Error:', error);
+    console.error("Error:", error);
   }
 };
 ```
@@ -334,9 +342,9 @@ def get_user_profile(token):
     headers = {
         'Authorization': f'Bearer {token}'
     }
-    
+
     response = requests.get(url, headers=headers)
-    
+
     if response.status_code == 200:
         return response.json()
     else:
@@ -364,42 +372,42 @@ curl -X PUT 'https://your-domain.com/api/users/profile' \
 ```javascript
 const updateUserProfile = async (email, fullName, password = null) => {
   try {
-    const token = localStorage.getItem('token');
-    
+    const token = localStorage.getItem("token");
+
     if (!token) {
-      throw new Error('Not authenticated');
+      throw new Error("Not authenticated");
     }
-    
+
     const data = {};
-    
+
     if (email) {
       data.email = email;
     }
-    
+
     if (fullName) {
       data.full_name = fullName;
     }
-    
+
     if (password) {
       data.password = password;
     }
-    
-    const response = await fetch('https://your-domain.com/api/users/profile', {
-      method: 'PUT',
+
+    const response = await fetch("https://your-domain.com/api/users/profile", {
+      method: "PUT",
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
-    
+
     if (!response.ok) {
-      throw new Error('Failed to update user profile');
+      throw new Error("Failed to update user profile");
     }
-    
+
     return await response.json();
   } catch (error) {
-    console.error('Error:', error);
+    console.error("Error:", error);
   }
 };
 ```
@@ -415,19 +423,19 @@ def update_user_profile(token, email=None, full_name=None, password=None):
         'Authorization': f'Bearer {token}',
         'Content-Type': 'application/json'
     }
-    
+
     data = {}
     if email:
         data['email'] = email
-    
+
     if full_name:
         data['full_name'] = full_name
-    
+
     if password:
         data['password'] = password
-    
+
     response = requests.put(url, headers=headers, json=data)
-    
+
     if response.status_code == 200:
         return response.json()
     else:

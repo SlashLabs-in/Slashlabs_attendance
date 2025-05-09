@@ -1,7 +1,7 @@
 {
   "info": {
-    "name": "Attendance Management System API",
-    "description": "API collection for the Attendance Management System",
+    "name": "SlashLabs Attendance System API",
+    "description": "API collection for the SlashLabs Attendance System",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [

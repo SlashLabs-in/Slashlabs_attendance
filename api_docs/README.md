@@ -1,8 +1,8 @@
-# Attendance Management System API Documentation
+# SlashLabs Attendance System API Documentation
 
 ## Overview
 
-This document provides information about the Attendance Management System's API endpoints. The API allows mobile applications and other systems to interact with the attendance system, enabling check-ins, check-outs, and data retrieval.
+This document provides information about the SlashLabs Attendance System's API endpoints. The API allows mobile applications and other systems to interact with the SlashLabs Attendance, enabling check-ins, check-outs, and data retrieval.
 
 ## Base URL
 
@@ -92,12 +92,12 @@ Record a user's check-in to work.
 
 **Request Parameters**:
 
-| Parameter | Type   | Required | Description                                |
-|-----------|--------|----------|--------------------------------------------|
-| image     | File   | No       | Image file to capture during check-in      |
-| location  | String | No       | Location description or coordinates         |
-| status    | String | No       | Attendance status (default: 'present')      |
-| notes     | String | No       | Additional notes about the check-in         |
+| Parameter | Type   | Required | Description                            |
+| --------- | ------ | -------- | -------------------------------------- |
+| image     | File   | No       | Image file to capture during check-in  |
+| location  | String | No       | Location description or coordinates    |
+| status    | String | No       | Attendance status (default: 'present') |
+| notes     | String | No       | Additional notes about the check-in    |
 
 **Success Response**:
 
@@ -137,10 +137,10 @@ Record a user's check-out from work.
 
 **Request Parameters**:
 
-| Parameter | Type   | Required | Description                               |
-|-----------|--------|----------|-------------------------------------------|
-| image     | File   | No       | Image file to capture during check-out     |
-| notes     | String | No       | Additional notes about the check-out       |
+| Parameter | Type   | Required | Description                            |
+| --------- | ------ | -------- | -------------------------------------- |
+| image     | File   | No       | Image file to capture during check-out |
+| notes     | String | No       | Additional notes about the check-out   |
 
 **Success Response**:
 
@@ -180,11 +180,11 @@ Retrieve a user's attendance history.
 
 **Query Parameters**:
 
-| Parameter  | Type    | Required | Description                             |
-|------------|---------|----------|-----------------------------------------|
-| page       | Integer | No       | Page number for pagination (default: 1)  |
-| per_page   | Integer | No       | Records per page (default: 10)           |
-| start_date | String  | No       | Filter records from this date (YYYY-MM-DD) |
+| Parameter  | Type    | Required | Description                                 |
+| ---------- | ------- | -------- | ------------------------------------------- |
+| page       | Integer | No       | Page number for pagination (default: 1)     |
+| per_page   | Integer | No       | Records per page (default: 10)              |
+| start_date | String  | No       | Filter records from this date (YYYY-MM-DD)  |
 | end_date   | String  | No       | Filter records until this date (YYYY-MM-DD) |
 
 **Success Response**:
@@ -291,14 +291,14 @@ Update the current user's profile information.
 
 ## Status Codes
 
-| Status Code | Description                                          |
-|-------------|------------------------------------------------------|
-| 200         | OK - The request has succeeded                        |
-| 201         | Created - The request has been fulfilled              |
-| 400         | Bad Request - The request could not be understood     |
-| 401         | Unauthorized - Authentication is required             |
-| 404         | Not Found - The requested resource was not found      |
-| 500         | Server Error - An error occurred on the server        |
+| Status Code | Description                                       |
+| ----------- | ------------------------------------------------- |
+| 200         | OK - The request has succeeded                    |
+| 201         | Created - The request has been fulfilled          |
+| 400         | Bad Request - The request could not be understood |
+| 401         | Unauthorized - Authentication is required         |
+| 404         | Not Found - The requested resource was not found  |
+| 500         | Server Error - An error occurred on the server    |
 
 ---
 
@@ -306,28 +306,28 @@ Update the current user's profile information.
 
 ### User
 
-| Field       | Type    | Description                                      |
-|-------------|---------|--------------------------------------------------|
-| id          | Integer | Unique identifier                                |
-| username    | String  | Unique username                                  |
-| email       | String  | User's email address                             |
-| full_name   | String  | User's full name                                 |
-| role        | String  | User's role (admin or employee)                  |
-| department  | String  | User's department                                |
-| position    | String  | User's job position                              |
+| Field      | Type    | Description                     |
+| ---------- | ------- | ------------------------------- |
+| id         | Integer | Unique identifier               |
+| username   | String  | Unique username                 |
+| email      | String  | User's email address            |
+| full_name  | String  | User's full name                |
+| role       | String  | User's role (admin or employee) |
+| department | String  | User's department               |
+| position   | String  | User's job position             |
 
 ### Attendance
 
-| Field          | Type     | Description                                   |
-|----------------|----------|-----------------------------------------------|
-| id             | Integer  | Unique identifier                             |
-| user_id        | Integer  | ID of the user                                |
-| check_in_time  | Datetime | Time of check-in                              |
-| check_out_time | Datetime | Time of check-out (can be null)               |
-| status         | String   | Attendance status (present, late, absent)     |
-| image_path     | String   | Path to the uploaded image                    |
-| location       | String   | Location information                          |
-| notes          | String   | Additional notes                              |
+| Field          | Type     | Description                               |
+| -------------- | -------- | ----------------------------------------- |
+| id             | Integer  | Unique identifier                         |
+| user_id        | Integer  | ID of the user                            |
+| check_in_time  | Datetime | Time of check-in                          |
+| check_out_time | Datetime | Time of check-out (can be null)           |
+| status         | String   | Attendance status (present, late, absent) |
+| image_path     | String   | Path to the uploaded image                |
+| location       | String   | Location information                      |
+| notes          | String   | Additional notes                          |
 
 ---
 

@@ -1,6 +1,6 @@
-# Attendance Management System API Quick Start Guide
+# SlashLabs Attendance System API Quick Start Guide
 
-This quick start guide will help you get started with the Attendance Management System API quickly.
+This quick start guide will help you get started with the SlashLabs Attendance System API quickly.
 
 ## Authentication
 
@@ -13,6 +13,7 @@ POST /api/login
 ```
 
 Example with cURL:
+
 ```bash
 curl -X POST 'https://your-domain.com/api/login' \
 -H 'Content-Type: application/json' \
@@ -23,6 +24,7 @@ curl -X POST 'https://your-domain.com/api/login' \
 ```
 
 The response will include a JWT token:
+
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -55,6 +57,7 @@ POST /api/attendance/check-in
 ```
 
 Example with cURL:
+
 ```bash
 curl -X POST 'https://your-domain.com/api/attendance/check-in' \
 -H 'Authorization: Bearer YOUR_TOKEN_HERE' \
@@ -71,6 +74,7 @@ POST /api/attendance/check-out
 ```
 
 Example with cURL:
+
 ```bash
 curl -X POST 'https://your-domain.com/api/attendance/check-out' \
 -H 'Authorization: Bearer YOUR_TOKEN_HERE' \
@@ -86,6 +90,7 @@ GET /api/attendance/history
 ```
 
 Example with cURL:
+
 ```bash
 curl -X GET 'https://your-domain.com/api/attendance/history' \
 -H 'Authorization: Bearer YOUR_TOKEN_HERE'
@@ -100,6 +105,7 @@ GET /api/users/profile
 ```
 
 Example with cURL:
+
 ```bash
 curl -X GET 'https://your-domain.com/api/users/profile' \
 -H 'Authorization: Bearer YOUR_TOKEN_HERE'
@@ -114,6 +120,7 @@ PUT /api/users/profile
 ```
 
 Example with cURL:
+
 ```bash
 curl -X PUT 'https://your-domain.com/api/users/profile' \
 -H 'Authorization: Bearer YOUR_TOKEN_HERE' \
